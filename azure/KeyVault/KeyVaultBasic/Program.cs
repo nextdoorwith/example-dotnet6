@@ -13,7 +13,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
 // このサンプルで使用するシークレット名
-const string SecretName = "mysecret06";
+const string SecretName = "mysecret01";
 
 // キーコンテナURI(Azureポータルのキーコンテナの[概要]を参照)
 const string KeyVaultUri = "https://deveval.vault.azure.net/";
@@ -33,8 +33,11 @@ var client = new SecretClient(new Uri(KeyVaultUri), new DefaultAzureCredential()
 //   https://docs.microsoft.com/ja-jp/dotnet/azure/sdk/pagination
 Console.WriteLine($"=== secret list");
 var propsPageable = client.GetPropertiesOfSecretsAsync();
-var propsList = await propsPageable.ToListAsync(); // await foreachでも可
-for (var i = 0; i < propsList.Count; i++)
+var propsList = await propsPageable
+    .Where(x => x.Enabled.Value) // 有効なシークレットのみ
+    .OrderBy(x => x.Name)
+    .ToListAsync();
+for (var i = 0; i < propsList.Count; i++) // 非同期Linqを使わずawait foreachでも可
     Console.WriteLine($"{i}: {propsList[i].Name}");
 
 Console.WriteLine($"=== secret: {SecretName}");
@@ -93,7 +96,7 @@ var operation = await client.StartDeleteSecretAsync(SecretName);
 // シークレットの物理削除(purge)
 // - 物理削除(purge)や回復(recovery)を行う場合、論理削除の完了の待機が必要
 // - アクセスポリシーの[特権シークレットの操作]の[削除]権限が必要
-// - 権限がない場合、次の例外
+// - 権限がないや消去保護が有効な場合、次の例外になる
 //   Azure.RequestFailedException(0x8013150): 403 (Forbidden)
 Console.WriteLine("wait deleting: start");
 await operation.WaitForCompletionAsync();
