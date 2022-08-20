@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
@@ -64,30 +65,36 @@ namespace AesBasicExample
             _logger.WriteLine("RunTime " + elapsedTime);
         }
 
-        [Fact(DisplayName ="暗号化・復号化できること。(バイト列)")]
-        public void EncryptDecryptByBytesTest()
-        {
-            var key = AesUtils.CreateKey();
-            var iv = AesUtils.CreateIv();
-
-            var ciphertext = AesUtils.Encrypt(TestCleartext, key, iv);
-            var decrypted = AesUtils.Decrypt(ciphertext, key, iv);
-
-            Assert.True(ciphertext.Length % (128 / 8) == 0);
-            Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
-        }
-
         [Fact(DisplayName = "暗号化・復号化できること。(ストリーム)")]
         public void EncryptDecryptByStreamTest()
         {
-            var key = AesUtils.CreateKey();
-            var iv = AesUtils.CreateIv();
+            using var aes = Aes.Create();
+            aes.GenerateKey();
+            aes.GenerateIV();
+            var key = aes.Key;
+            var iv = aes.IV;
 
             using var output = new MemoryStream();
             AesUtils.Encrypt(output, TestCleartext, key, iv);
             using var input = new MemoryStream(output.ToArray());
             var decrypted = AesUtils.Decrypt(input, key, iv);
 
+            Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
+        }
+
+        [Fact(DisplayName ="暗号化・復号化できること。(バイト列)")]
+        public void EncryptDecryptByBytesTest()
+        {
+            using var aes = Aes.Create();
+            aes.GenerateKey();
+            aes.GenerateIV();
+            var key = aes.Key;
+            var iv = aes.IV;
+
+            var ciphertext = AesUtils.Encrypt(TestCleartext, key, iv);
+            var decrypted = AesUtils.Decrypt(ciphertext, key, iv);
+
+            Assert.True(ciphertext.Length % (128 / 8) == 0);
             Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
         }
 

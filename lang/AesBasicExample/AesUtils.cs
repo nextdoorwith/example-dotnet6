@@ -78,26 +78,6 @@ namespace AesBasicExample
             return key.GetBytes(AesKeyBytes);
         }
 
-        public static byte[] Encrypt(byte[] cleartext, byte[] key, byte[] iv)
-        {
-            using var aes = CreateInstance();
-            aes.Key = key;
-            aes.IV = iv;
-            using var encryptor = aes.CreateEncryptor();
-            return encryptor.TransformFinalBlock(cleartext, 0, cleartext.Length);
-        }
-
-        public static byte[] Decrypt(byte[] ciphertext, byte[] key, byte[] iv)
-        {
-            using var aes = CreateInstance();
-            aes.Key = key;
-            aes.IV = iv;
-            using var decryptor = aes.CreateDecryptor();
-            return decryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
-        }
-
-        // ストリーム操作
-
         public static void Encrypt(Stream output, byte[] cleartext, byte[] key, byte[] iv)
         {
             using var aes = CreateInstance();
@@ -120,6 +100,25 @@ namespace AesBasicExample
             cryptoStream.CopyTo(output);
             return output.ToArray();
         }
+
+        public static byte[] Encrypt(byte[] cleartext, byte[] key, byte[] iv)
+        {
+            using var aes = CreateInstance();
+            aes.Key = key;
+            aes.IV = iv;
+            using var encryptor = aes.CreateEncryptor();
+            return encryptor.TransformFinalBlock(cleartext, 0, cleartext.Length);
+        }
+
+        public static byte[] Decrypt(byte[] ciphertext, byte[] key, byte[] iv)
+        {
+            using var aes = CreateInstance();
+            aes.Key = key;
+            aes.IV = iv;
+            using var decryptor = aes.CreateDecryptor();
+            return decryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
+        }
+
 
         // その他
 
