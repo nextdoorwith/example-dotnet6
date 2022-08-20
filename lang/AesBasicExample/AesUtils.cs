@@ -4,8 +4,15 @@ namespace AesBasicExample
 {
     public static class AesUtils
     {
-        private const int KeySize = 256;
-        private const int KeyBytes = KeySize / 8;
+        /// <summary>
+        /// AESキーサイズ(ビット数)
+        /// </summary>
+        private const int AesKeySize = 256;
+
+        /// <summary>
+        /// AESキーサイズ(バイト数)
+        /// </summary>
+        private const int AesKeyBytes = AesKeySize / 8;
 
         /// <summary>
         /// PBKDF2用ソルト長
@@ -68,7 +75,7 @@ namespace AesBasicExample
             // (既定はSHA-1だが安全性が低いため。CA5379も参考のこと。)
             var key = new Rfc2898DeriveBytes(password, passwordSalt,
                 Pbkdf2Iteration, HashAlgorithmName.SHA256);
-            return key.GetBytes(KeyBytes);
+            return key.GetBytes(AesKeyBytes);
         }
 
         public static byte[] Encrypt(byte[] cleartext, byte[] key, byte[] iv)
@@ -119,8 +126,8 @@ namespace AesBasicExample
         private static Aes CreateInstance()
         {
             var aes = Aes.Create();
-            aes.BlockSize = 128; // 既定値(AESの有効なブロックサイズは128bit)
-            aes.KeySize = KeySize; // 既定値は256(128, 192, 256bitを使用可)
+            aes.BlockSize = 128; // 既定値(AESの有効なブロックサイズは128bit固定)
+            aes.KeySize = AesKeySize; // 既定値は256(128, 192, 256bitを使用可)
             aes.Mode = CipherMode.CBC; // 既定値
             aes.Padding = PaddingMode.PKCS7; // 既定値
             return aes;

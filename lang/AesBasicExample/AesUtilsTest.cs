@@ -7,7 +7,10 @@ namespace AesBasicExample
 {
     public class AesUtilsTest
     {
+        // テストで使用する平文例
         private const string TestText = @"１２３４５６７８９０壱弐参四五六七八九〇";
+
+        // テストで使用する平文例(UTF-8バイト列)
         private static readonly byte[] TestCleartext = Encoding.UTF8.GetBytes(TestText);
 
         private readonly ITestOutputHelper _logger;
