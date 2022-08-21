@@ -18,12 +18,12 @@ Console.WriteLine("-----");
     Console.WriteLine("{0,-10}: {1}({2})", "cleartext", Convert.ToHexString(cleartext), cleartext.Length);
 
     using var output = new MemoryStream();
-    AesUtils.Encrypt(output, cleartext, key, iv);
+    AesExample.Encrypt(output, cleartext, key, iv);
     var ciphertext = output.ToArray();
     Console.WriteLine("{0,-10}: {1}({2})", "ciphertext", Convert.ToHexString(ciphertext), ciphertext.Length);
 
     using var input = new MemoryStream(ciphertext);
-    var decrypted = AesUtils.Decrypt(input, key, iv);
+    var decrypted = AesExample.Decrypt(input, key, iv);
     Console.WriteLine("{0,-10}: {1}({2})", "decrypted", Convert.ToHexString(decrypted), decrypted.Length);
 }
 Console.WriteLine("-----");
@@ -41,9 +41,9 @@ Console.WriteLine("-----");
     Console.WriteLine("{0,-10}: {1}", "text", text);
     Console.WriteLine("{0,-10}: {1}({2})", "cleartext", Convert.ToHexString(cleartext), cleartext.Length);
 
-    var ciphertext = AesUtils.Encrypt(cleartext, key, iv);
+    var ciphertext = AesExample.Encrypt(cleartext, key, iv);
     Console.WriteLine("{0,-10}: {1}({2})", "ciphertext", Convert.ToHexString(ciphertext), ciphertext.Length);
 
-    var decrypted = AesUtils.Decrypt(ciphertext, key, iv);
+    var decrypted = AesExample.Decrypt(ciphertext, key, iv);
     Console.WriteLine("{0,-10}: {1}({2})", "decrypted", Convert.ToHexString(decrypted), decrypted.Length);
 }

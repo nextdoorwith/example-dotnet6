@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace AesBasicExample
 {
-    public class AesUtilsTest
+    public class AesExampleTest
     {
         // テストで使用する平文例
         private const string TestText = @"１２３４５６７８９０壱弐参四五六七八九〇";
@@ -16,32 +16,32 @@ namespace AesBasicExample
 
         private readonly ITestOutputHelper _logger;
 
-        public AesUtilsTest(ITestOutputHelper logger)
+        public AesExampleTest(ITestOutputHelper logger)
             => _logger = logger;
 
         [Fact(DisplayName = "生成されたキーは256ビットであること。")]
         public void CreateKeyTest()
         {
-            Assert.True(AesUtils.CreateKey().Length == (256/8));
+            Assert.True(AesExample.CreateKey().Length == (256/8));
         }
 
         [Fact(DisplayName = "生成された初期ベクトルは128ビットであること。")]
         public void CreateIvTest()
         {
-            Assert.True(AesUtils.CreateIv().Length == (128 / 8));
+            Assert.True(AesExample.CreateIv().Length == (128 / 8));
         }
 
         [Fact(DisplayName = "生成されたソルトは128ビットであること。")]
         public void CreatePasswordSaltTest()
         {
-            Assert.True(AesUtils.CreatePasswordSalt().Length == (128/8));
+            Assert.True(AesExample.CreatePasswordSalt().Length == (128/8));
         }
 
         [Fact(DisplayName = "生成されたキーは256ビットであること。")]
         public void CreateKeyFromPasswordTest()
         {
-            var salt = AesUtils.CreatePasswordSalt();
-            Assert.True(AesUtils.CreateKeyFromPassword("password", salt).Length == (256/8));
+            var salt = AesExample.CreatePasswordSalt();
+            Assert.True(AesExample.CreateKeyFromPassword("password", salt).Length == (256/8));
         }
 
         [Fact(DisplayName = "パスワードからキー生成の性能評価")]
@@ -52,8 +52,8 @@ namespace AesBasicExample
             sw.Start();
             for(var i=0; i< MaxCount; i++)
             {
-                var salt = AesUtils.CreatePasswordSalt();
-                _ = AesUtils.CreateKeyFromPassword("password", salt);
+                var salt = AesExample.CreatePasswordSalt();
+                _ = AesExample.CreateKeyFromPassword("password", salt);
             }
             sw.Stop();
 
@@ -75,9 +75,9 @@ namespace AesBasicExample
             var iv = aes.IV;
 
             using var output = new MemoryStream();
-            AesUtils.Encrypt(output, TestCleartext, key, iv);
+            AesExample.Encrypt(output, TestCleartext, key, iv);
             using var input = new MemoryStream(output.ToArray());
-            var decrypted = AesUtils.Decrypt(input, key, iv);
+            var decrypted = AesExample.Decrypt(input, key, iv);
 
             Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
         }
@@ -91,8 +91,8 @@ namespace AesBasicExample
             var key = aes.Key;
             var iv = aes.IV;
 
-            var ciphertext = AesUtils.Encrypt(TestCleartext, key, iv);
-            var decrypted = AesUtils.Decrypt(ciphertext, key, iv);
+            var ciphertext = AesExample.Encrypt(TestCleartext, key, iv);
+            var decrypted = AesExample.Decrypt(ciphertext, key, iv);
 
             Assert.True(ciphertext.Length % (128 / 8) == 0);
             Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
@@ -101,12 +101,12 @@ namespace AesBasicExample
         [Fact(DisplayName = "暗号化・復号化できること。(バイト列・ストリーム)")]
         public void EncryptDecryptBytesStreamTest()
         {
-            var key = AesUtils.CreateKey();
-            var iv = AesUtils.CreateIv();
+            var key = AesExample.CreateKey();
+            var iv = AesExample.CreateIv();
 
-            var ciphertext = AesUtils.Encrypt(TestCleartext, key, iv);
+            var ciphertext = AesExample.Encrypt(TestCleartext, key, iv);
             using var input = new MemoryStream(ciphertext);
-            var decrypted = AesUtils.Decrypt(input, key, iv);
+            var decrypted = AesExample.Decrypt(input, key, iv);
 
             Assert.True(ciphertext.Length % (128 / 8) == 0);
             Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
@@ -115,13 +115,13 @@ namespace AesBasicExample
         [Fact(DisplayName = "暗号化・復号化できること。(ストリーム・バイト列)")]
         public void EncryptDecryptStreamBytesTest()
         {
-            var key = AesUtils.CreateKey();
-            var iv = AesUtils.CreateIv();
+            var key = AesExample.CreateKey();
+            var iv = AesExample.CreateIv();
 
             using var output = new MemoryStream();
-            AesUtils.Encrypt(output, TestCleartext, key, iv);
+            AesExample.Encrypt(output, TestCleartext, key, iv);
             var ciphertext = output.ToArray();
-            var decrypted = AesUtils.Decrypt(ciphertext, key, iv);
+            var decrypted = AesExample.Decrypt(ciphertext, key, iv);
 
             Assert.True(ciphertext.Length % (128 / 8) == 0);
             Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
@@ -130,12 +130,12 @@ namespace AesBasicExample
         [Fact(DisplayName = "パスワードから暗号化・復号化できること。")]
         public void EncryptDecryptByPasswordTest()
         {
-            var salt = AesUtils.CreatePasswordSalt();
-            var key = AesUtils.CreateKeyFromPassword("password", salt);
-            var iv = AesUtils.CreateIv();
+            var salt = AesExample.CreatePasswordSalt();
+            var key = AesExample.CreateKeyFromPassword("password", salt);
+            var iv = AesExample.CreateIv();
 
-            var ciphertext = AesUtils.Encrypt(TestCleartext, key, iv);
-            var decrypted = AesUtils.Decrypt(ciphertext, key, iv);
+            var ciphertext = AesExample.Encrypt(TestCleartext, key, iv);
+            var decrypted = AesExample.Decrypt(ciphertext, key, iv);
 
             Assert.True(ciphertext.Length % (128 / 8) == 0);
             Assert.Equal(TestText, Encoding.UTF8.GetString(decrypted));
