@@ -61,7 +61,7 @@ namespace DbExample
         }
 
         [Fact]
-        public void DumpTableColumns()
+        public void DumpTableColumnsTest()
         {
             using var context = new AppDbContext();
 
@@ -87,7 +87,7 @@ namespace DbExample
         }
 
         [Fact]
-        public void DumpPrimaryKeys()
+        public void DumpPrimaryKeysTest()
         {
             using var context = new AppDbContext();
 
@@ -105,11 +105,10 @@ namespace DbExample
         }
 
         [Fact]
-        public void DumpForeignKeys()
+        public void DumpForeignKeysTest()
         {
             using var context = new AppDbContext();
 
-            // ※PKがないテーブルの場合、FindPrimaryKey()はnull
             var entityType = context.Model.FindEntityType(typeof(MOrderDetail));
 
             // カラム毎に外部キーの有無を確認
@@ -128,7 +127,7 @@ namespace DbExample
         }
 
         [Fact]
-        public async Task TruncateTables()
+        public async Task TruncateTablesTest()
         {
             // 外部キー参照先テーブルはtruncateできないのでdeleteする。
             // https://learn.microsoft.com/ja-jp/sql/t-sql/statements/truncate-table-transact-sql?view=sql-server-ver16#restrictions
@@ -161,7 +160,7 @@ namespace DbExample
         }
 
         [Fact]
-        public async Task UpdateRowsExamples()
+        public async Task UpdateNullColumnsTest()
         {
             var context = new AppDbContext();
             var e = new TSales()
@@ -169,19 +168,19 @@ namespace DbExample
                 RegionId = 1,
                 Year = 2023,
                 Revenue = null, // default: 0
-                Expense = 500,// default: 0
-                Profit = -500// default: 0
+                Expense = 500, // default: 0
+                Profit = -500 // default: 0
             };
             await context.AddAsync(e);
 
-            // SaveChangesAsync()すると、Entityに既定値が反映されてしまうので
-            // 反映前にnull更新用SQLを生成
+            // 既定値指定がありnullが設定されているプロパティをnullにするSQLを生成する。
+            // （SaveChangesAsync()すると、Entityに既定値が反映されてしまうので
+            // 反映前にnull更新用SQLを生成）
             var (nullUpdateSql, nullUpdatePs) = CreateNullUpdateSql(context, e);
 
             await context.SaveChangesAsync();
 
             // 既定値あり項目をnullで更新する。
-            // (管理対象Entityとの不整合を回避するために変更追跡クリア)
             var affected = await context.Database.ExecuteSqlRawAsync(nullUpdateSql, nullUpdatePs);
             Assert.Equal(1, affected);
 
@@ -193,8 +192,8 @@ namespace DbExample
 
             var r2 = await context.TSales.AsNoTracking().SingleAsync();
             Console.WriteLine($"after : {r2.Revenue}, {r2.Expense}, {r2.Profit}");
-
         }
+
         private (string, object[]) CreateNullUpdateSql(DbContext context, object entity)
         {
             var modelType = context.Model.FindEntityType(entity.GetType());
@@ -231,7 +230,7 @@ namespace DbExample
         }
 
         [Fact]
-        public async void TestCreateInsertable()
+        public async void CreateInsertableTest()
         {
             using var context = new AppDbContext();
             var e = CreateInsertableEntity<MEmployee>(context);
@@ -277,6 +276,20 @@ namespace DbExample
                 propInfo.SetValue(target, value);
             }
             return target;
+        }
+
+        [Fact]
+        public async Task DynamicDbSetTest()
+        {
+            var context = new AppDbContext();
+
+            await DumpCountAsync<MEmployee>(context);
+            await DumpCountAsync<MOrder>(context);
+        }
+        private async Task DumpCountAsync<T>(AppDbContext context) where T : class
+        {
+            var count = await context.Set<T>().CountAsync();
+            Console.WriteLine($"{typeof(T).Name}: {count}");
         }
 
     }

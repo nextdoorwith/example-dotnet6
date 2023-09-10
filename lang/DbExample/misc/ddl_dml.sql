@@ -103,3 +103,31 @@ CREATE TABLE [dbo].[z_test_nopk](
 	[desc2] [nvarchar](256) NOT NULL
 ) ON [PRIMARY]
 GO
+
+
+-- ★単体テスト実行時にEnsureCreated()等で初期化
+
+USE [DbExample]
+GO
+
+DECLARE @inituser [varchar](8), @initdate [datetime2]
+SET @inituser = 'initdata'; SET @initdate = getdate();
+
+TRUNCATE TABLE [dbo].[m_employee];
+TRUNCATE TABLE [dbo].[t_sales];
+
+INSERT INTO [dbo].[m_employee]
+      ([employee_no],[name] ,[address],[gender] ,[retired] ,[birthday],[internal_id],[created_by],[created_on],[updated_by],[updated_on])
+VALUES
+      ('N200200123', N'テスト太郎', N'東京都', 0, 0, '1970-01-01', newid(), @inituser, @initdate, @inituser, @initdate),
+      ('N200901001', N'テスト花子', N'千葉県', 1, 1, '1980-02-02', newid(), @inituser, @initdate, @inituser, @initdate);
+
+INSERT INTO [dbo].[t_sales]
+	([region_id],[year],[month],[revenue],[expense],[profit],[created_by],[created_on],[updated_by],[updated_on])
+VALUES
+	(100, 2020, 01, 1000, 200, 800, @inituser, @initdate, @inituser, @initdate),
+	(100, 2020, 02, 1100, 200, 900, @inituser, @initdate, @inituser, @initdate),
+	(110, 2021, 01, 2000, 100, 1900, @inituser, @initdate, @inituser, @initdate),
+	(110, 2021, 02, 2100, 600, 1500, @inituser, @initdate, @inituser, @initdate);
+
+GO
