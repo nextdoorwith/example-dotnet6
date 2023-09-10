@@ -162,7 +162,7 @@ namespace DbExample
         [Fact]
         public async Task UpdateNullColumnsTest()
         {
-            var context = new AppDbContext();
+            using var context = new AppDbContext();
             var e = new TSales()
             {
                 RegionId = 1,
@@ -281,7 +281,7 @@ namespace DbExample
         [Fact]
         public async Task DynamicDbSetTest()
         {
-            var context = new AppDbContext();
+            using var context = new AppDbContext();
 
             await DumpCountAsync<MEmployee>(context);
             await DumpCountAsync<MOrder>(context);
