@@ -3,6 +3,8 @@ using DbExample.Context;
 using DbExample.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.VisualBasic;
 using System.Collections.Immutable;
 using Xunit;
 using Xunit.Abstractions;
@@ -90,40 +92,69 @@ namespace DbExample
         public void DumpPrimaryKeysTest()
         {
             using var context = new AppDbContext();
-
-            // ※PKがないテーブルの場合、FindPrimaryKey()はnull
             var entityType = context.Model.FindEntityType(typeof(TSales));
-            var props = entityType.FindPrimaryKey()?.Properties;
-            foreach (var p in props)
+
+            // エンティティからの主キー情報の取得
+            // ※PKがないテーブルの場合、FindPrimaryKey()はnull
+            var pkProps = entityType.FindPrimaryKey()?.Properties;
+            foreach (var p in pkProps)
             {
-                var propName = p.Name;
-                var propType = p.ClrType;
                 var colName = p.GetColumnName();
                 var colType = p.GetColumnType();
-                Console.WriteLine($"{propName}[{propType}] <-> {colName}[{colType}]");
+                Console.WriteLine($"{p.Name}[{p.ClrType}]: {colName}[{colType}]");
             }
+
+            Console.WriteLine("---");
+
+            // 各プロパティを主キーか判定
+            var props = entityType.GetProperties();
+            foreach(var p in props)
+            {
+                Console.WriteLine($"{p.Name}[{p.ClrType}]: {p.IsPrimaryKey()}");
+            }
+
         }
+
 
         [Fact]
         public void DumpForeignKeysTest()
         {
             using var context = new AppDbContext();
-
             var entityType = context.Model.FindEntityType(typeof(MOrderDetail));
 
-            // カラム毎に外部キーの有無を確認
+            // エンティティからの外部キー情報の取得
+            var fksFromEntity = entityType.GetForeignKeys();
+            foreach (var fk in fksFromEntity) DumpForeignKey(fk);
+
+            Console.WriteLine("---");
+
+            // プロパティを指定した外部キー情報の取得
+            var prop = entityType.FindProperty(nameof(MOrderDetail.OrderId));
+            var fksFromProp = entityType.FindForeignKeys(prop);
+            foreach (var fk in fksFromProp) DumpForeignKey(fk);
+
+            Console.WriteLine("---");
+
+            // 各プロパティからの外部キー情報の取得
             var props = entityType.GetProperties();
             foreach (var p in props)
             {
-                var propName = p.Name;
                 var fks = p.GetContainingForeignKeys();
-                foreach (var fk in fks)
-                {
-                    var fkEntityType = fk.PrincipalEntityType; // 参照先
-                    var fkEntityName = fkEntityType.Name;
-                    Console.WriteLine($"{propName} -> {fkEntityName}");
-                }
+                foreach (var fk in fks) DumpForeignKey(fk);
             }
+
+        }
+        // 外部キーはIForeignKeyで表現される
+        private void DumpForeignKey(IForeignKey fk)
+        {
+            // IReadOnlyForeignKey.cs(ToDebugString())を参考
+            var fromKeys = fk.Properties.Select(e => e.GetColumnName());
+            var toTable = fk.PrincipalEntityType.GetTableName();
+            var toKeys = fk.PrincipalKey.Properties.Select(e => e.GetColumnName());
+            //
+            var fromKeysStr = string.Join(", ", fromKeys);
+            var toKeysStr = string.Join(", ", toKeys);
+            Console.WriteLine($"[{fromKeysStr}] -> {toTable}[{toKeysStr}]");
         }
 
         [Fact]
@@ -139,19 +170,18 @@ namespace DbExample
             var entities = context.Model.GetEntityTypes();
 
             // 外部キー参照先テーブル一覧(truncate不可テーブル)
-            var fkTables = entities
-                .SelectMany(e => e.GetForeignKeys()
-                    .Select(c => c.PrincipalEntityType.GetTableName())
-                    .Where(e => !string.IsNullOrEmpty(e))
-                );
+            var fkToTables = entities
+                .SelectMany(e => e.GetForeignKeys().Select(k => k.PrincipalEntityType.GetTableName()))
+                .Where(e => !string.IsNullOrEmpty(e))
+                .Distinct();
             // 外部キーなしテーブル一覧(truncate可テーブル)
             var noFkTables = entities
                 .Select(e => e.GetTableName())
                 .Where(e => !string.IsNullOrEmpty(e))
-                .Except(fkTables);
+                .Except(fkToTables);
 
             var truncates = noFkTables.Select(e => $"truncate table [{e}]");
-            var deletes = fkTables.Select(e => $"delete from [{e}]");
+            var deletes = fkToTables.Select(e => $"delete from [{e}]");
             foreach (var sql in truncates.Concat(deletes))
             {
                 Console.WriteLine(sql);
@@ -262,8 +292,8 @@ namespace DbExample
                 var propType = propInfo.PropertyType;
                 object value;
                 if (propType == typeof(string)) value = "str";
-                else if (propType == typeof(byte)) value = 1;
-                else if (propType == typeof(short)) value = 2;
+                else if (propType == typeof(byte)) value = (byte)1;
+                else if (propType == typeof(short)) value = (short)2;
                 else if (propType == typeof(int)) value = 3;
                 else if (propType == typeof(long)) value = 4L;
                 else if (propType == typeof(float)) value = 5f;

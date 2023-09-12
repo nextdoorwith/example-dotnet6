@@ -63,9 +63,8 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<MProduct>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("pk_m_product");
+            entity.HasKey(e => new { e.Type, e.Id }).HasName("pk_m_product");
 
-            entity.Property(e => e.ProductId).ValueGeneratedNever();
             entity.Property(e => e.Version)
                 .IsRowVersion()
                 .IsConcurrencyToken();

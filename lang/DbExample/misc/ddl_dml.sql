@@ -57,7 +57,8 @@ DROP TABLE IF EXISTS [dbo].[m_product];
 DROP INDEX IF EXISTS [dbo].[pk_m_product];
 
 CREATE TABLE [dbo].[m_product](
-	[product_id] [int] NOT NULL,
+	[type] [smallint] NOT NULL,
+	[id] [int] NOT NULL,
 	[product_code] [varchar](16) NOT NULL,
 	[product_name] [nvarchar](256) NOT NULL,
 	[price] [money] NOT NULL,
@@ -67,7 +68,7 @@ CREATE TABLE [dbo].[m_product](
 	[updated_by] [varchar](8) NOT NULL,
 	[updated_on] [datetime2] NOT NULL,
 	[version] [timestamp] NOT NULL,
-	CONSTRAINT [pk_m_product] PRIMARY KEY CLUSTERED ([product_id])
+	CONSTRAINT [pk_m_product] PRIMARY KEY CLUSTERED ([type], [id])
 ) ON [PRIMARY]
 GO
 CREATE TABLE [dbo].[m_order](
@@ -83,6 +84,7 @@ CREATE TABLE [dbo].[m_order](
 GO
 CREATE TABLE [dbo].[m_order_detail](
 	[order_id] [int] NOT NULL,
+	[product_type] [smallint] NOT NULL,
 	[product_id] [int] NOT NULL,
 	[created_by] [varchar](8) NOT NULL,
 	[created_on] [datetime2] NOT NULL,
@@ -91,7 +93,8 @@ CREATE TABLE [dbo].[m_order_detail](
 	[version] [timestamp] NOT NULL,
 	CONSTRAINT [pk_m_order_detail] PRIMARY KEY CLUSTERED ([order_id], [product_id]),
 	CONSTRAINT [fk_m_order_detail_order_id] FOREIGN KEY ([order_id]) REFERENCES [m_order] ([order_id]),
-	CONSTRAINT [fk_m_order_detail_product_id] FOREIGN KEY ([product_id]) REFERENCES [m_product] ([product_id])
+	CONSTRAINT [fk_m_order_detail_product_id] FOREIGN KEY ([product_type], [product_id]) 
+		REFERENCES [m_product] ([type], [id])
 ) ON [PRIMARY]
 GO
 

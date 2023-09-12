@@ -14,6 +14,9 @@ public partial class MOrderDetail
     [Column("order_id")]
     public int OrderId { get; set; }
 
+    [Column("product_type")]
+    public short ProductType { get; set; }
+
     [Key]
     [Column("product_id")]
     public int ProductId { get; set; }
@@ -44,7 +47,7 @@ public partial class MOrderDetail
     [InverseProperty("MOrderDetail")]
     public virtual MOrder Order { get; set; }
 
-    [ForeignKey("ProductId")]
+    [ForeignKey("ProductType, ProductId")]
     [InverseProperty("MOrderDetail")]
     public virtual MProduct Product { get; set; }
 }

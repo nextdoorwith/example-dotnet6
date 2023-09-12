@@ -6,12 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DbExample.Entity;
 
+[PrimaryKey("Type", "Id")]
 [Table("m_product")]
 public partial class MProduct
 {
     [Key]
-    [Column("product_id")]
-    public int ProductId { get; set; }
+    [Column("type")]
+    public short Type { get; set; }
+
+    [Key]
+    [Column("id")]
+    public int Id { get; set; }
 
     [Required]
     [Column("product_code")]
