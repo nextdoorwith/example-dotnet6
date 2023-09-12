@@ -112,9 +112,7 @@ namespace DbExample
             {
                 Console.WriteLine($"{p.Name}[{p.ClrType}]: {p.IsPrimaryKey()}");
             }
-
         }
-
 
         [Fact]
         public void DumpForeignKeysTest()
