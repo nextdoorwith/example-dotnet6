@@ -110,7 +110,8 @@ namespace DbExample
             var props = entityType.GetProperties();
             foreach(var p in props)
             {
-                Console.WriteLine($"{p.Name}[{p.ClrType}]: {p.IsPrimaryKey()}");
+                var isPk = p.IsPrimaryKey();
+                Console.WriteLine($"{p.Name}[{p.ClrType}]: {isPk}");
             }
         }
 

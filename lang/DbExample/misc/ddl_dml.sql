@@ -92,7 +92,8 @@ CREATE TABLE [dbo].[m_order_detail](
 	[updated_on] [datetime2] NOT NULL,
 	[version] [timestamp] NOT NULL,
 	CONSTRAINT [pk_m_order_detail] PRIMARY KEY CLUSTERED ([order_id], [product_id]),
-	CONSTRAINT [fk_m_order_detail_order_id] FOREIGN KEY ([order_id]) REFERENCES [m_order] ([order_id]),
+	CONSTRAINT [fk_m_order_detail_order_id] FOREIGN KEY ([order_id])
+		REFERENCES [m_order] ([order_id]),
 	CONSTRAINT [fk_m_order_detail_product_id] FOREIGN KEY ([product_type], [product_id]) 
 		REFERENCES [m_product] ([type], [id])
 ) ON [PRIMARY]
