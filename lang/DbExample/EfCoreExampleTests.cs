@@ -3,7 +3,6 @@ using DbExample.Context;
 using DbExample.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.VisualBasic;
 using System.Collections.Immutable;
 using Xunit;
