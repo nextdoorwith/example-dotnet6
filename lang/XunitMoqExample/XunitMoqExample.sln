@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33712.159
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XunitMoqExample", "XunitMoqExample.csproj", "{50110377-F13B-4E2D-A4C4-55E8CFC2B5FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50110377-F13B-4E2D-A4C4-55E8CFC2B5FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50110377-F13B-4E2D-A4C4-55E8CFC2B5FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50110377-F13B-4E2D-A4C4-55E8CFC2B5FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50110377-F13B-4E2D-A4C4-55E8CFC2B5FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {222D65A6-44B4-4D1E-87CF-A94AF1FDE5C5}
+	EndGlobalSection
+EndGlobal
