@@ -77,6 +77,7 @@ namespace HttpClientExample.Utils
             var sb = new StringBuilder();
             if (bytes == null) return sb.ToString();
 
+            // 印刷可能文字のみ出力(印刷不可は"."で出力)
             foreach (var c in bytes.Select(e => (char)e))
                 sb.Append(char.IsAscii(c) &&
                     (c == '\r' || c == '\n' || c == ' ' || !char.IsControl((char)c)) ? c : ".");
