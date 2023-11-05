@@ -55,7 +55,7 @@ namespace HttpClientExample.Controllers
             {
                 {"key1", "値１" }, { "key2", "1234"}
             };
-            using var content = new FormUrlEncodedContent(forms); // application/x-www-form-urlencoded
+            using var content = new FormUrlEncodedContent(forms); // "application/x-www-form-urlencoded"
             using var req = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
@@ -164,17 +164,20 @@ namespace HttpClientExample.Controllers
 
         public async Task<IActionResult> PostMultiPartTest()
         {
+
             var baseUri = new Uri($"{Request.Scheme}://{Request.Host}{Request.PathBase}");
             var targetUri = new Uri(baseUri, "api/DummyApi?body=json");
 
             using var part1 = new StringContent("値１");
-            using var part2 = new StreamContent(new MemoryStream(Resource.Image1));
-            using var part3 = new StreamContent(new MemoryStream(Resource.Image2));
+            using var part2 = new ByteArrayContent(_image1bytes);
+            part2.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+            using var part3 = new ByteArrayContent(_image2bytes);
+            part3.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
             using var multipartContent = new MultipartFormDataContent
             {
                 { part1, "key1" },
                 { part2, "key2", "sample1.png" },
-                { part3, "key3", "サンプル２.png" }
+                { part3, "key3", "サンプル２.jpg" }
             };
             using var req = new HttpRequestMessage()
             {
